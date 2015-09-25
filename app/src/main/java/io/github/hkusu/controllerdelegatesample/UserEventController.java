@@ -17,6 +17,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnEditorAction;
+import butterknife.OnTextChanged;
 import de.greenrobot.event.EventBus;
 
 public class UserEventController {
@@ -51,6 +52,7 @@ public class UserEventController {
     }
 
     public void onStart() {
+        mCreateButton.setEnabled(false); // 初期は[登録]ボタンを非活性に
     }
 
     public void onResume() {
@@ -66,10 +68,19 @@ public class UserEventController {
     }
 
     /**
+     * 入力エリアのテキスト変更
+     */
+    @OnTextChanged(R.id.todoEditText)
+    public void onTodoEditTextChanged() {
+        // [登録]ボタンを活性化
+        mCreateButton.setEnabled(true);
+    }
+
+    /**
      * [登録]ボタン押下
      */
     @OnClick(R.id.createButton)
-    public void onButtonClick() {
+    public void onCreateButtonClick() {
         // 入力内容が空の場合は何もしない
         if (mTodoEditText.getText().toString().equals("")) {
             return;
@@ -85,7 +96,7 @@ public class UserEventController {
      * @return イベント処理結果(trueは消化済の意)
      */
     @OnEditorAction(R.id.todoEditText)
-    public boolean onEditTextEditorAction(KeyEvent event) {
+    public boolean onTodoEditTextEditorAction(KeyEvent event) {
         // 入力内容が空の場合は何もしない
         if (mTodoEditText.getText().toString().equals("")) {
             return true;
@@ -114,6 +125,8 @@ public class UserEventController {
         if (mActivity.get() != null) {
             ((InputMethodManager) mActivity.get().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
         }
+        // [登録]ボタンを非活性に
+        mCreateButton.setEnabled(false);
     }
 
     /**
@@ -122,7 +135,7 @@ public class UserEventController {
      * @param event EventBus用のイベントクラス
      */
     @SuppressWarnings("unused")
-    public void onEvent(TodoListAdapter.RemoveButtonClickedEvent event) {
+    public void onEvent(TodoListAdapter.DeleteButtonClickedEvent event) {
         // データ操作モデルを通して削除
         TodoModel.getInstance().removeById(event.getId());
     }

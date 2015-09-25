@@ -70,16 +70,16 @@ public class TodoListAdapter extends ArrayAdapter<TodoEntity> {
          * [削除]ボタン押下
          */
         @OnClick(R.id.deleteButton)
-        public void onButtonClick() {
+        public void onDeleteButtonClick() {
             // EventBus経由でボタンが押下された旨を通知
-            EventBus.getDefault().post(new RemoveButtonClickedEvent(id));
+            EventBus.getDefault().post(new DeleteButtonClickedEvent(id));
         }
     }
 
     /**
      * EventBus用のイベントクラス
      */
-    public static class RemoveButtonClickedEvent {
+    public static class DeleteButtonClickedEvent {
 
         /** Todoデータのid */
         private int id;
@@ -89,7 +89,7 @@ public class TodoListAdapter extends ArrayAdapter<TodoEntity> {
          *
          * @param id 削除対象のTodoデータのid
          */
-        private RemoveButtonClickedEvent(int id) {
+        private DeleteButtonClickedEvent(int id) {
             this.id = id;
         }
 
