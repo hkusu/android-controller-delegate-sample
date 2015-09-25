@@ -2,6 +2,7 @@ package io.github.hkusu.controllerdelegatesample;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -40,9 +41,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         ButterKnife.bind(this); // ButterKnife
 
-        //mToolBar.setTitle(R.string.app_name);
+        mToolBar.setTitle(R.string.app_name);
         setSupportActionBar(mToolBar);
 
         // Todoデータ操作モデルのインスタンスを取得
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * EventBusからの通知の購読（Realm上のTodoデータの変更）
+     * EventBusからの通知の購読（Realm上のTodoデータの変更）*メインスレッドで受ける*
      *
      * @param event EventBus用のイベントクラス
      */
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
      * @param event EventBus用のイベントクラス
      */
     @SuppressWarnings("unused")
-    public void onEventMainThread(TodoListAdapter.RemoveButtonClickedEvent event) {
+    public void onEvent(TodoListAdapter.RemoveButtonClickedEvent event) {
         // データ操作モデルを通して削除
         mTodoModel.removeById(event.getId());
     }
@@ -143,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 画面での入力内容をRealmへ登録するPrivateメソッド
      */
+    @MainThread
     private void registerTodo() {
         // Todoデータを作成
         TodoEntity todoEntity = new TodoEntity();
@@ -158,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 画面の表示を更新するPrivateメソッド
      */
+    @MainThread
     private void updateView() {
         // データセットの変更があった旨をAdapterへ通知
         mTodoListAdapter.notifyDataSetChanged();
