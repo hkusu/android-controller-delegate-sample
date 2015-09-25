@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Controllerを作成
         mUserEventController = new UserEventController(this);
-        mUserEventController.onCreate();
+        ButterKnife.bind(mUserEventController, this); // ButterKnife
     }
 
     @Override
@@ -70,22 +70,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mUserEventController.onResume();
         EventBus.getDefault().register(this); // EventBus
+        EventBus.getDefault().register(mUserEventController); // EventBus
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mUserEventController.onPause();
         EventBus.getDefault().unregister(this); // EventBus
+        EventBus.getDefault().unregister(mUserEventController); // EventBus
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mUserEventController.onDestroy();
         ButterKnife.unbind(this); // ButterKnife
+        ButterKnife.unbind(mUserEventController); // ButterKnife
     }
 
     /**

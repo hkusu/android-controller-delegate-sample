@@ -14,11 +14,9 @@ import android.widget.TextView;
 import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnEditorAction;
 import butterknife.OnTextChanged;
-import de.greenrobot.event.EventBus;
 
 public class UserEventController {
 
@@ -45,26 +43,8 @@ public class UserEventController {
         mActivity = new WeakReference<>(activity).get();
     }
 
-    public void onCreate() {
-        if (mActivity != null) {
-            ButterKnife.bind(this, mActivity); // ButterKnife
-        }
-    }
-
     public void onStart() {
         mCreateButton.setEnabled(false); // 初期は[登録]ボタンを非活性に
-    }
-
-    public void onResume() {
-        EventBus.getDefault().register(this); // EventBus
-    }
-
-    public void onPause() {
-        EventBus.getDefault().unregister(this); // EventBus
-    }
-
-    public void onDestroy() {
-        ButterKnife.unbind(this); // ButterKnife
     }
 
     /**
