@@ -1,13 +1,10 @@
 package io.github.hkusu.controllerdelegatesample;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -15,8 +12,6 @@ import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnEditorAction;
 import de.greenrobot.event.EventBus;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,39 +27,42 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.todoListView)
     ListView mTodoListView;
 
-    /** Todoデータ操作モデルのインスタンス */
-    private TodoModel mTodoModel;
     /** Todoデータ表示用ListViewにセットするListAdapter */
     private TodoListAdapter mTodoListAdapter;
+    /** ユーザイベントをハンドリングするController */
+    private UserEventController mUserEventController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ButterKnife.bind(this); // ButterKnife
 
+        // ToolBarの設定
         mToolbar.setTitle(R.string.app_name);
         setSupportActionBar(mToolbar);
-
-        // Todoデータ操作モデルのインスタンスを取得
-        mTodoModel = TodoModel.getInstance();
-        // 起動時にソフトウェアキーボードが表示されないようにする
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         // ListAdapterを作成
         mTodoListAdapter = new TodoListAdapter(
                 this,
                 R.layout.adapter_todo_list,
-                mTodoModel.get() // ListViewに表示するデータセット
+                TodoModel.getInstance().get() // ListViewに表示するデータセット
         );
         // ListViewにAdapterをセット
         mTodoListView.setAdapter(mTodoListAdapter);
+
+        // 起動時にソフトウェアキーボードが表示されないようにする
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        // Controllerを作成
+        mUserEventController = new UserEventController(this);
+        mUserEventController.onCreate();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        mUserEventController.onStart();
         // 画面の初期表示
         updateView();
     }
@@ -72,56 +70,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mUserEventController.onResume();
         EventBus.getDefault().register(this); // EventBus
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        mUserEventController.onPause();
         EventBus.getDefault().unregister(this); // EventBus
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mUserEventController.onDestroy();
         ButterKnife.unbind(this); // ButterKnife
     }
 
     /**
-     * [登録]ボタン押下
-     */
-    @OnClick(R.id.createButton)
-    public void onButtonClick() {
-        // 入力内容が空の場合は何もしない
-        if (mTodoEditText.getText().toString().equals("")) {
-            return;
-        }
-        // Todoデータを登録
-        registerTodo();
-    }
-
-    /**
-     * 入力エリアでEnter
-     *
-     * @param event キーイベント
-     * @return イベント処理結果(trueは消化済み)
-     */
-    @OnEditorAction(R.id.todoEditText)
-    public boolean onEditTextEditorAction(KeyEvent event) {
-        // 入力内容が空の場合は何もしない
-        if (mTodoEditText.getText().toString().equals("")) {
-            return true;
-        }
-        // 前半はソフトウェアキーボードのEnterキーの判定、後半は物理キーボードでの判定
-        if (event == null || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-            // Todoデータを登録
-            registerTodo();
-        }
-        return true;
-    }
-
-    /**
-     * EventBusからの通知の購読（Realm上のTodoデータの変更）*メインスレッドで受ける*
+     * EventBusからの通知の購読（Realm上のTodoデータの変更）*Viewの操作を伴う為メインスレッドで受ける*
      *
      * @param event EventBus用のイベントクラス
      */
@@ -132,33 +100,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * EventBusからの通知の購読（削除ボタンの押下）
-     *
-     * @param event EventBus用のイベントクラス
-     */
-    @SuppressWarnings("unused")
-    public void onEvent(TodoListAdapter.RemoveButtonClickedEvent event) {
-        // データ操作モデルを通して削除
-        mTodoModel.removeById(event.getId());
-    }
-
-    /**
-     * 画面での入力内容をRealmへ登録するPrivateメソッド
-     */
-    @MainThread
-    private void registerTodo() {
-        // Todoデータを作成
-        TodoEntity todoEntity = new TodoEntity();
-        todoEntity.setText(mTodoEditText.getText().toString());
-        // データ操作モデルを通して登録
-        mTodoModel.createOrUpdate(todoEntity);
-        // 入力内容は空にする
-        mTodoEditText.setText(null);
-        // ソフトウェアキーボードを隠す
-        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
-    }
-
-    /**
      * 画面の表示を更新するPrivateメソッド
      */
     @MainThread
@@ -166,6 +107,6 @@ public class MainActivity extends AppCompatActivity {
         // データセットの変更があった旨をAdapterへ通知
         mTodoListAdapter.notifyDataSetChanged();
         // Todoデータの件数を更新
-        mCountTextView.setText(String.valueOf(mTodoModel.getSize()));
+        mCountTextView.setText(String.valueOf(TodoModel.getInstance().getSize()));
     }
 }
