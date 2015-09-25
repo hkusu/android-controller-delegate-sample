@@ -22,15 +22,15 @@ import de.greenrobot.event.EventBus;
 public class MainActivity extends AppCompatActivity {
 
     @Bind(R.id.toolbar)
-    Toolbar mToolBar;
-    @Bind(R.id.editText)
-    EditText mEditText;
-    @Bind(R.id.button)
-    Button mButton;
-    @Bind(R.id.textView)
-    TextView mTextView;
-    @Bind(R.id.listView)
-    ListView mListView;
+    Toolbar mToolbar;
+    @Bind(R.id.todoEditText)
+    EditText mTodoEditText;
+    @Bind(R.id.createButton)
+    Button mCreateButton;
+    @Bind(R.id.countTextView)
+    TextView mCountTextView;
+    @Bind(R.id.todoListView)
+    ListView mTodoListView;
 
     /** Todoデータ操作モデルのインスタンス */
     private TodoModel mTodoModel;
@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this); // ButterKnife
 
-        mToolBar.setTitle(R.string.app_name);
-        setSupportActionBar(mToolBar);
+        mToolbar.setTitle(R.string.app_name);
+        setSupportActionBar(mToolbar);
 
         // Todoデータ操作モデルのインスタンスを取得
         mTodoModel = TodoModel.getInstance();
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 mTodoModel.get() // ListViewに表示するデータセット
         );
         // ListViewにAdapterをセット
-        mListView.setAdapter(mTodoListAdapter);
+        mTodoListView.setAdapter(mTodoListAdapter);
     }
 
     @Override
@@ -90,10 +90,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * [登録]ボタン押下
      */
-    @OnClick(R.id.button)
+    @OnClick(R.id.createButton)
     public void onButtonClick() {
         // 入力内容が空の場合は何もしない
-        if (mEditText.getText().toString().equals("")) {
+        if (mTodoEditText.getText().toString().equals("")) {
             return;
         }
         // Todoデータを登録
@@ -103,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 入力エリアでEnter
      *
-     * @param  event キーイベント
+     * @param event キーイベント
      * @return イベント処理結果(trueは消化済み)
      */
-    @OnEditorAction(R.id.editText)
+    @OnEditorAction(R.id.todoEditText)
     public boolean onEditTextEditorAction(KeyEvent event) {
         // 入力内容が空の場合は何もしない
-        if (mEditText.getText().toString().equals("")) {
+        if (mTodoEditText.getText().toString().equals("")) {
             return true;
         }
         // 前半はソフトウェアキーボードのEnterキーの判定、後半は物理キーボードでの判定
@@ -149,13 +149,13 @@ public class MainActivity extends AppCompatActivity {
     private void registerTodo() {
         // Todoデータを作成
         TodoEntity todoEntity = new TodoEntity();
-        todoEntity.setText(mEditText.getText().toString());
+        todoEntity.setText(mTodoEditText.getText().toString());
         // データ操作モデルを通して登録
         mTodoModel.createOrUpdate(todoEntity);
         // 入力内容は空にする
-        mEditText.setText(null);
+        mTodoEditText.setText(null);
         // ソフトウェアキーボードを隠す
-        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
     }
 
     /**
@@ -166,6 +166,6 @@ public class MainActivity extends AppCompatActivity {
         // データセットの変更があった旨をAdapterへ通知
         mTodoListAdapter.notifyDataSetChanged();
         // Todoデータの件数を更新
-        mTextView.setText(String.valueOf(mTodoModel.getSize()));
+        mCountTextView.setText(String.valueOf(mTodoModel.getSize()));
     }
 }

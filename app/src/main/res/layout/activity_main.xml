@@ -33,7 +33,7 @@
             >
 
             <EditText
-                android:id="@+id/editText"
+                android:id="@+id/todoEditText"
                 android:inputType="text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                 />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/createButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
@@ -63,7 +63,7 @@
                 />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/countTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
@@ -71,7 +71,7 @@
         </LinearLayout>
 
         <ListView
-            android:id="@+id/listView"
+            android:id="@+id/todoListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />

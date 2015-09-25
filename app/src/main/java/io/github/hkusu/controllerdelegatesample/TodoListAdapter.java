@@ -42,7 +42,7 @@ public class TodoListAdapter extends ArrayAdapter<TodoEntity> {
         // この行のTodoデータを取得
         TodoEntity todoEntity = getItem(position);
         // Todoのテキストを表示
-        viewHolder.mTextView.setText(todoEntity.getText());
+        viewHolder.mTodoTextView.setText(todoEntity.getText());
         // [削除]ボタン用にidを保持
         viewHolder.id = todoEntity.getId();
 
@@ -54,10 +54,10 @@ public class TodoListAdapter extends ArrayAdapter<TodoEntity> {
      */
     static class ViewHolder {
 
-        @Bind(R.id.textView)
-        TextView mTextView;
-        @Bind(R.id.button)
-        Button mButton;
+        @Bind(R.id.todoTextView)
+        TextView mTodoTextView;
+        @Bind(R.id.deleteButton)
+        Button mDeleteButton;
 
         /** Todoデータのid */
         private int id;
@@ -69,7 +69,7 @@ public class TodoListAdapter extends ArrayAdapter<TodoEntity> {
         /**
          * [削除]ボタン押下
          */
-        @OnClick(R.id.button)
+        @OnClick(R.id.deleteButton)
         public void onButtonClick() {
             // EventBus経由でボタンが押下された旨を通知
             EventBus.getDefault().post(new RemoveButtonClickedEvent(id));
