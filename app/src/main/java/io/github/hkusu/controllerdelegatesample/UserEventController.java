@@ -34,7 +34,7 @@ public class UserEventController {
     ListView mTodoListView;
 
     /** Activity(弱参照で保持) */
-    private final WeakReference<Activity> mActivity;
+    private final Activity mActivity;
 
     /**
      * コンストラクタ
@@ -42,12 +42,12 @@ public class UserEventController {
      * @param activity Activityへの参照
      */
     public UserEventController(Activity activity) {
-        mActivity = new WeakReference<>(activity);
+        mActivity = new WeakReference<>(activity).get();
     }
 
     public void onCreate() {
-        if (mActivity.get() != null) {
-            ButterKnife.bind(this, mActivity.get()); // ButterKnife
+        if (mActivity != null) {
+            ButterKnife.bind(this, mActivity); // ButterKnife
         }
     }
 
@@ -122,8 +122,8 @@ public class UserEventController {
         // 入力内容は空にする
         mTodoEditText.setText(null);
         // ソフトウェアキーボードを隠す
-        if (mActivity.get() != null) {
-            ((InputMethodManager) mActivity.get().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
+        if (mActivity != null) {
+            ((InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
         }
         // [登録]ボタンを非活性に
         mCreateButton.setEnabled(false);
