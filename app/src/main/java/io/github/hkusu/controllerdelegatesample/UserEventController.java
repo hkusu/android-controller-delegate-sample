@@ -32,7 +32,7 @@ public class UserEventController {
     ListView mTodoListView;
 
     /** Activity(弱参照で保持) */
-    private final Activity mActivity;
+    private final WeakReference<Activity> mWeakReferenceActivity;
 
     /**
      * コンストラクタ
@@ -40,7 +40,7 @@ public class UserEventController {
      * @param activity Activityへの参照
      */
     public UserEventController(Activity activity) {
-        mActivity = new WeakReference<>(activity).get();
+        mWeakReferenceActivity = new WeakReference<>(activity);
     }
 
     public void onStart() {
@@ -102,8 +102,8 @@ public class UserEventController {
         // 入力内容は空にする
         mTodoEditText.setText(null);
         // ソフトウェアキーボードを隠す
-        if (mActivity != null) {
-            ((InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
+        if (mWeakReferenceActivity.get() != null) {
+            ((InputMethodManager) mWeakReferenceActivity.get().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
         }
         // [登録]ボタンを非活性に
         mCreateButton.setEnabled(false);
