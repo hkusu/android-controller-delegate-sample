@@ -1,6 +1,5 @@
 package io.github.hkusu.controllerdelegatesample;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.MainThread;
 import android.support.v7.widget.Toolbar;
@@ -10,8 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -31,16 +28,15 @@ public class UserEventController {
     @Bind(R.id.todoListView)
     ListView mTodoListView;
 
-    /** Activity(弱参照で保持) */
-    private final WeakReference<Activity> mWeakReferenceActivity;
+    private Context mContext;
 
     /**
      * コンストラクタ
      *
-     * @param activity Activityへの参照
+     * @param context Context
      */
-    public UserEventController(Activity activity) {
-        mWeakReferenceActivity = new WeakReference<>(activity);
+    public UserEventController(Context context) {
+        mContext = context;
     }
 
     public void onStart() {
@@ -102,9 +98,7 @@ public class UserEventController {
         // 入力内容は空にする
         mTodoEditText.setText(null);
         // ソフトウェアキーボードを隠す
-        if (mWeakReferenceActivity.get() != null) {
-            ((InputMethodManager) mWeakReferenceActivity.get().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
-        }
+        ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTodoEditText.getWindowToken(), 0);
         // [登録]ボタンを非活性に
         mCreateButton.setEnabled(false);
     }

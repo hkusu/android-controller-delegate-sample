@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         // Controllerを作成
-        mUserEventController = new UserEventController(this);
+        mUserEventController = new UserEventController(getApplicationContext());
         ButterKnife.bind(mUserEventController, this); // ButterKnife
     }
 
